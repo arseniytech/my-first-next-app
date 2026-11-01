@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My First Next.js App
 
-## Getting Started
+Первый проект на Next.js — практическая работа по введению в фреймворк.
+Страницы, клиентский компонент, динамический маршрут и API-маршрут.
 
-First, run the development server:
+## Запуск
 
-```bash
+```
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Приложение будет на http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Что внутри
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/` — главная со ссылками на статьи
+- `/about` — Server Component с данными с сервера + Client Component-счётчик
+- `/blog/nextjs-vvedenie` и `/blog/react-osnovy` — динамический маршрут `[slug]` со статической генерацией через `generateStaticParams`
+- `/api/hello` — API-маршрут, возвращает JSON
 
-## Learn More
+## Вопросы для самопроверки
 
-To learn more about Next.js, take a look at the following resources:
+1. **Чем Next.js отличается от «чистого» React и какие задачи он решает?**
+   Next.js — это фреймворк поверх React. Он добавляет то, чего нет в чистом React: файловую маршрутизацию, серверный рендеринг, генерацию статики (SSG), API-маршруты. React — только библиотека для UI, всё остальное (роутинг, сборка, оптимизация) решается сторонними инструментами.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Как работает файловая маршрутизация в App Router? Приведите пример создания динамического маршрута.**
+   Структура папок в `app/` повторяет URL. `app/about/page.tsx` → `/about`. Динамический сегмент — папка в квадратных скобках: `app/blog/[slug]/page.tsx` → `/blog/любой-слаг`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **В чём разница между Server Components и Client Components? Когда нужно использовать директиву 'use client'?**
+   Server Components рендерятся на сервере, не отправляют JS в браузер, могут быть async. Client Components гидратируются в браузере, у них доступны хуки и обработчики событий. `'use client'` нужен, когда компоненту нужна интерактивность: useState, useEffect, onClick.
 
-## Deploy on Vercel
+4. **Что такое generateStaticParams и зачем она используется?**
+   Функция, которая на этапе сборки говорит Next.js, какие динамические маршруты сгенерировать как статические HTML. В моём случае: `[{ slug: 'nextjs-vvedenie' }, { slug: 'react-osnovy' }]` — две статьи собираются заранее.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. **Почему в Server Components можно использовать async/await напрямую, а в Client Components — нет?**
+   Серверный компонент исполняется один раз на сервере, там можно спокойно дождаться данных через await. Клиентский компонент работает в браузере, где рендеринг синхронный — данные приходится подгружать через useEffect + state.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. **Как создать API-маршрут в App Router? Приведите минимальный пример.**
+   Файл `app/api/hello/route.ts` с экспортом функции GET:
+   ```ts
+   import { NextResponse } from 'next/server';
+   export async function GET() {
+     return NextResponse.json({ message: 'Hello from Next.js!' });
+   }
+   ```
+
+7. **Какие файлы в директории app/ становятся страницами, а какие выполняют служебную роль?**
+   Страницей становится только файл `page.tsx`. `layout.tsx` — общий каркас, `loading.tsx` — состояние загрузки, `error.tsx` — обработка ошибок, `route.ts` — API-маршрут.
